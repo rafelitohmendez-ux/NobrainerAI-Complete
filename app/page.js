@@ -94,16 +94,8 @@ export default function Dashboard() {
                     title="Document Builder"
                     description="Generate professional documents and reports"
                   />
-                   <AgentCard
-                    icon="ugc"
-                    title="AI UGC video Generator"
-                    description="Generate professional AI enabled UGC videos"
-                  />
-                  <AgentCard
-                    icon="website"
-                    title="AI Landing Page Generator"
-                    description="Generate professional Landing Page using AI"
-                  />
+                
+                 
                 </div>
               </>
             )}
