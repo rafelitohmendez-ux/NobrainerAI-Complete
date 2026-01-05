@@ -1,0 +1,279 @@
+'use client'
+'use client';
+
+import { useState } from 'react';
+import axios from 'axios';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+
+export default function PodcastGenerator() {
+  const [projectName, setProjectName] = useState('');
+  const [description, setDescription] = useState('');
+  const [podcastType, setPodcastType] = useState('');
+  const [episodeCount, setEpisodeCount] = useState(3);
+  const [generatedEpisodes, setGeneratedEpisodes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Gemini AI Configuration
+  const genAI = new GoogleGenerativeAI('AIzaSyAVatQQ5qhcrb0mFWb31RnEjZ_wxBJ9szU');
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    responseMimeType: "text/plain",
+  };
+
+  const safetySettings = [
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+  ];
+
+  // Parse episodes from generated text
+  const parseEpisodesFromText = (text) => {
+    const episodes = [];
+    const episodeRegex = /Episode (\d+) Title: (.+)\nEpisode \1 Description: (.+)(?:\n|$)/g;
+    
+    let match;
+    while ((match = episodeRegex.exec(text)) !== null) {
+      episodes.push({
+        title: match[2].trim(),
+        description: match[3].trim(),
+        audioUrl: null
+      });
+    }
+
+    return episodes;
+  };
+
+  // Generate audio for episode
+  const generateEpisodeAudio = async (text) => {
+    try {
+      const response = await axios.post(
+        'https://api.deepgram.com/v1/speak', 
+        { text },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token f883b4f68bb943dfaca5faba2ef56c225e002edb`
+          },
+          responseType: 'blob'
+        }
+      );
+
+      const audioBlob = new Blob([response.data], { type: 'audio/mp3' });
+      return URL.createObjectURL(audioBlob);
+    } catch (error) {
+      console.error('Audio generation error:', error);
+      return '';
+    }
+  };
+
+  // Generate Podcast Episodes
+  const handleGeneratePodcast = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const prompt = `Create a podcast series for a project called "${projectName}". 
+      The project description is: "${description}". 
+      Podcast Type: ${podcastType}. 
+      Generate ${episodeCount} unique episode titles and detailed descriptions.
+      Format: 
+      Episode 1 Title: [Title]
+      Episode 1 Description: [Detailed Description]
+      
+      (Repeat for each episode)`;
+
+      const chatSession = model.startChat({
+        generationConfig,
+        safetySettings,
+      });
+
+      const result = await chatSession.sendMessage(prompt);
+      const episodesText = result.response.text();
+
+      // Parse episodes
+      const episodes = parseEpisodesFromText(episodesText);
+
+      // Generate audio for each episode
+      const episodesWithAudio = await Promise.all(
+        episodes.map(async (episode) => ({
+          ...episode,
+          audioUrl: await generateEpisodeAudio(episode.description)
+        }))
+      );
+
+      setGeneratedEpisodes(episodesWithAudio);
+    } catch (error) {
+      console.error('Podcast generation error:', error);
+      alert('Failed to generate podcast. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Download Audio
+  const handleDownload = (audioUrl, title) => {
+    const link = document.createElement('a');
+    link.href = audioUrl;
+    link.download = `${title}.mp3`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="container mx-auto p-6 max-w-4xl">
+      <h1 className="text-4xl font-bold text-center mb-8 text-blue-600">
+        AI Podcast Generator
+      </h1>
+      
+      {/* Podcast Generation Form */}
+      <form 
+        onSubmit={handleGeneratePodcast} 
+        className="bg-white shadow-2xl rounded-lg p-8 mb-8"
+      >
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-gray-700 mb-2">
+              Project Name
+              <input 
+                type="text"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                required
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter project name"
+              />
+            </label>
+          </div>
+          
+          <div>
+            <label className="block text-gray-700 mb-2">
+              Podcast Type
+              <select 
+                value={podcastType}
+                onChange={(e) => setPodcastType(e.target.value)}
+                required
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Podcast Type</option>
+                <option value="educational">Educational</option>
+                <option value="storytelling">Storytelling</option>
+                <option value="interview">Interview</option>
+                <option value="tech">Technology</option>
+                <option value="news">News & Analysis</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2">
+            Podcast Description
+            <textarea 
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              rows={4}
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Describe your podcast concept"
+            />
+          </label>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-gray-700 mb-2">
+            Number of Episodes
+            <input 
+              type="number"
+              min="1"
+              max="10"
+              value={episodeCount}
+              onChange={(e) => setEpisodeCount(parseInt(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </label>
+        </div>
+
+        <button 
+          type="submit" 
+          disabled={isLoading}
+          className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-300 flex items-center justify-center"
+        >
+          {isLoading ? (
+            <svg 
+              className="animate-spin h-5 w-5 mr-3" 
+              viewBox="0 0 24 24"
+            >
+              <circle 
+                className="opacity-25" 
+                cx="12" 
+                cy="12" 
+                r="10" 
+                stroke="currentColor" 
+                strokeWidth="4"
+              ></circle>
+              <path 
+                className="opacity-75" 
+                fill="currentColor" 
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          ) : (
+            'Generate Podcast'
+          )}
+        </button>
+      </form>
+
+      {/* Generated Episodes */}
+      {generatedEpisodes.length > 0 && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {generatedEpisodes.map((episode, index) => (
+            <div 
+              key={index} 
+              className="bg-white shadow-lg rounded-lg p-6 transform transition duration-300 hover:scale-105"
+            >
+              <h2 className="text-2xl font-bold mb-4 text-blue-700">
+                {episode.title}
+              </h2>
+              <p className="text-gray-600 mb-4">
+                {episode.description}
+              </p>
+              
+              {episode.audioUrl && (
+                <div className="flex space-x-4 items-center">
+                  <audio 
+                    src={episode.audioUrl} 
+                    controls 
+                    className="flex-grow"
+                  />
+                  <button 
+                    onClick={() => handleDownload(episode.audioUrl, episode.title)}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                  >
+                    Download
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
