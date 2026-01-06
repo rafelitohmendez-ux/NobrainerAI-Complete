@@ -359,7 +359,7 @@ Add this code to your theme.liquid file, just before the closing </body> tag
   document.addEventListener('DOMContentLoaded', function() {
     var container = document.getElementById('ai-assistant-container');
     var iframe = document.createElement('iframe');
-    iframe.src = "https://nchatbot.netlify.app/bot?assistantId=${createdAssistantId}";
+    iframe.src = "https://nchatbot.netlify.app/bot/${createdAssistantId}";
     iframe.width = "100%";
     iframe.height = "600";
     iframe.frameBorder = "0";
