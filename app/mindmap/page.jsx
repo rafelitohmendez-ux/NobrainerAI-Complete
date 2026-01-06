@@ -11,11 +11,11 @@ import { Check, AlertCircle } from 'lucide-react';
 // API integration function
 const generateMindMapWithGemini = async (prompt) => {
   try {
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-goog-api-key': 'AIzaSyAVatQQ5qhcrb0mFWb31RnEjZ_wxBJ9szU',
+        'x-goog-api-key': `${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
       },
       body: JSON.stringify({
         contents: [{

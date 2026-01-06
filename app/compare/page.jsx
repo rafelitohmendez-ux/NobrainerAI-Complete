@@ -18,13 +18,8 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AI_PROVIDERS } from '../constants/aiProviders';
 import { sendMessageToProvider } from '../services/chatServices';
-import { useUser } from '@clerk/nextjs';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient('https://drzaxxnujlgrxhwbxqto.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyemF4eG51amxncnhod2J4cXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3OTg5ODcsImV4cCI6MjA0ODM3NDk4N30.YoNrlmGcKfuss9WD-XgsQQNrmGjkM8aQwvFAfsI8WzY')
 
 const ModelComparison = () => {
-  const { user } = useUser();
   const [selectedModels, setSelectedModels] = useState([]);
   const [responses, setResponses] = useState({});
   const [inputMessage, setInputMessage] = useState('');
@@ -35,94 +30,6 @@ const ModelComparison = () => {
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const chatEndRef = useRef(null);
   const [isComparisonLoading, setIsComparisonLoading] = useState(false);
-
-  useEffect(() => {
-    const initializeUserProviders = async () => {
-      if (!user) return;
-
-      try {
-        // First, check if entries already exist
-        const { data: existingEntries, error: checkError } = await supabase
-          .from('user_provider_keys')
-          .select('provider')
-          .eq('user_id', user.id);
-
-        if (checkError) throw checkError;
-
-        // Get providers without entries
-        const providersToInit = Object.keys(AI_PROVIDERS)
-          .filter(provider => 
-            !existingEntries.some(entry => entry.provider === provider)
-          );
-
-        // Insert empty entries for providers without existing records
-        if (providersToInit.length > 0) {
-          const newEntries = providersToInit.map(provider => ({
-            user_id: user.id,
-            provider: provider,
-            api_key: '', // Empty string initially
-          }));
-
-          const { error: insertError } = await supabase
-            .from('user_provider_keys')
-            .insert(newEntries);
-
-          if (insertError) throw insertError;
-        }
-      } catch (error) {
-        console.error('Error initializing user providers:', error);
-      }
-    };
-
-    // Fetch saved API keys
-    const fetchSavedApiKeys = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('user_provider_keys')
-          .select('provider, api_key')
-          .eq('user_id', user.id)
-          .not('api_key', 'eq', ''); // Only fetch non-empty keys
-
-        if (error) throw error;
-
-        const savedKeys = data.reduce((acc, item) => {
-          acc[item.provider] = item.api_key;
-          return acc;
-        }, {});
-
-        setApiKeys(savedKeys);
-      } catch (error) {
-        console.error('Error fetching API keys:', error);
-      }
-    };
-
-    // Run both initialization and key fetching
-    initializeUserProviders();
-    fetchSavedApiKeys();
-  }, [user]);
-
-  // Update API key for a specific provider
-  const saveApiKeyToSupabase = async (provider, apiKey) => {
-    if (!user) {
-      console.error('No user logged in');
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('user_provider_keys')
-        .update({ api_key: apiKey })
-        .eq('user_id', user.id)
-        .eq('provider', provider);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error saving API key:', error);
-    }
-  };
-
 
   // Group models by provider
   const groupedModels = Object.entries(AI_PROVIDERS).map(([providerId, provider]) => ({
@@ -145,7 +52,6 @@ const ModelComparison = () => {
       ...prev,
       [provider]: apiKey
     }));
-    saveApiKeyToSupabase(provider, apiKey);
     setShowApiKeyDialog(false);
   };
 
@@ -176,7 +82,8 @@ const ModelComparison = () => {
       alert(`Please set API keys for: ${missingKeys.map(m => AI_PROVIDERS[m.provider].name).join(', ')}`);
       return;
     }
-// Set loading state BEFORE any async operations
+
+    // Set loading state BEFORE any async operations
     setIsComparisonLoading(true);
     const newLoading = {};
     selectedModels.forEach(model => {
@@ -222,7 +129,6 @@ const ModelComparison = () => {
     });
 
     setResponses(prev => ({ ...prev, ...newResponsesFromPromises }));
-
     setIsComparisonLoading(false);
   };
 
@@ -350,11 +256,15 @@ const ModelComparison = () => {
             {/* API Key Management */}
             <Button 
               variant="outline" 
-              className="border-gray-800 bg-gradient-to-r from-indigo-800 to-purple-900  text-gray-300 hover:bg-gray-800 hover:border-indigo-700 transition-all duration-300"
+              className="border-gray-800 bg-gradient-to-r from-indigo-800 to-purple-900 text-gray-300 hover:bg-gray-800 hover:border-indigo-700 transition-all duration-300"
               onClick={() => {
                 const firstProviderWithoutKey = groupedModels.find(p => !apiKeys[p.provider]);
                 if (firstProviderWithoutKey) {
                   setSelectedProvider(firstProviderWithoutKey.provider);
+                  setShowApiKeyDialog(true);
+                } else {
+                  // If all providers have keys, show dialog for first provider
+                  setSelectedProvider(groupedModels[0].provider);
                   setShowApiKeyDialog(true);
                 }
               }}
@@ -453,13 +363,17 @@ const ModelComparison = () => {
           <form onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            handleApiKeySubmit(selectedProvider, formData.get('apiKey'));
+            const apiKeyValue = formData.get('apiKey');
+            if (apiKeyValue && apiKeyValue.trim()) {
+              handleApiKeySubmit(selectedProvider, apiKeyValue.trim());
+            }
           }}>
             <div className="space-y-4">
               <Input
                 name="apiKey"
                 type="password"
                 placeholder="Enter your API key"
+                defaultValue={apiKeys[selectedProvider] || ''}
                 className="bg-gray-900 border-gray-800 text-white focus:border-indigo-700 transition-all duration-300"
               />
               <div className="flex justify-end space-x-2">

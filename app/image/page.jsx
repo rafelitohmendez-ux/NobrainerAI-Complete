@@ -51,8 +51,7 @@ export default function ImageGeneratorPage() {
   const [generatedImages, setGeneratedImages] = useState([]); // Array to store multiple images
   const [error, setError] = useState(null);
 
-  const TOGETHER_API_KEY = 'dfb76af84e531818294f18274c3b122744972c02e8445ed0aceb27f07d389347'; // Replace with your actual API key
-
+ 
   const handleGenerate = async () => {
     if (!prompt || typeof prompt !== 'string') {
         throw new Error('Invalid prompt: Must provide a non-empty string');
@@ -69,7 +68,7 @@ export default function ImageGeneratorPage() {
 
         const response = await axios.post('https://api.together.xyz/v1/images/generations', data, {
             headers: {
-                'Authorization': `Bearer ${TOGETHER_API_KEY}`,
+                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_TOGETHER_API_KEY}`,
                 'Content-Type': 'application/json'
             }
         });

@@ -125,7 +125,7 @@ export default function PodcastGeneratorPage() {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Token f883b4f68bb943dfaca5faba2ef56c225e002edb`
+            'Authorization': `Token ${process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY}`
           },
           responseType: 'blob'
         }

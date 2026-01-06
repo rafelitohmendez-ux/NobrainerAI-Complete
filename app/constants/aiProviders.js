@@ -4,25 +4,25 @@ export const AI_PROVIDERS = {
       name: 'Mistral',
       models: [
         'mistral-large-latest',
-        'mistral-medium',
-        'mistral-small',
-        'pixtral-12b-2409'
+        'mistral-small-latest',
+        'pixtral-12b-2409',
+        'mistral-3-large'
       ]
     },
     groq: {
       name: 'Groq',
       models: [
-        'llama3-8b-8192',
-        'mixtral-8x7b-32768',
-        'gemma-7b-it'
+        'llama-3.1-8b-instant',
+        'llama-3.3-70b-versatile',
+        'qwen/qwen3-32b'
       ]
     },
     gemini: {
       name: 'Gemini',
       models: [
-        'gemini-1.5-pro-latest',
-        'gemini-1.5-flash-latest',
-        'gemini-pro'
+        'gemini-2.5-pro',
+        'gemini-2.5-flash',
+        'gemini-3-pro-preview'
       ]
     },
     anthropic: {
@@ -30,24 +30,24 @@ export const AI_PROVIDERS = {
       models: [
         'claude-3-haiku-20240307',
         'claude-3-sonnet-20240229',
-        'claude-3-opus-20240229',
-        'claude-3.5-sonnet-20240620'
+        'claude-3.5-sonnet-20240620',
+        'claude-4.5-opus-20251125'
       ]
     },
     grok: {
       name: 'Grok',
       models: [
-        'grok-1',
-        'grok-1.5',
-        'grok-beta'
+        'grok-3',
+        'grok-4-fast-reasoning',
+        'grok-4-1-fast-reasoning'
       ]
     },
     cohere: {
       name: 'Cohere',
       models: [
         'command-r-08-2024',
-        'command-light',
-        'command'
+        'command-r-plus-08-2024',
+        'command-a-03-2025'
       ]
     }
   };
@@ -117,5 +117,12 @@ export const AI_PROVIDERS = {
     "shoninsBeautiful_v10.safetensors [25d8c546]",
     "theallys-mix-ii-churned.safetensors [5d9225a4]",
     "timeless-1.0.ckpt [7c4971d4]",
-    "toonyou_beta6.safetensors [980f6b15]"
+    "toonyou_beta6.safetensors [980f6b15]",
+    // Added modern models for 2026 compatibility
+    "stable-diffusion-xl-base-1.0.safetensors [bf747ea0]",
+    "flux.1-dev.safetensors",
+    "stable-diffusion-3-medium.safetensors"
   ];
+
+
+  

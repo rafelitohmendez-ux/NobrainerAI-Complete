@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { createClient } from '@supabase/supabase-js';
 import { useVapi } from '@/hooks/useVapi';
 
-const supabase = createClient('https://drzaxxnujlgrxhwbxqto.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyemF4eG51amxncnhod2J4cXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3OTg5ODcsImV4cCI6MjA0ODM3NDk4N30.YoNrlmGcKfuss9WD-XgsQQNrmGjkM8aQwvFAfsI8WzY');
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY, process.env.NEXT_PUBLIC_SUPABASE_PRIVATE_KEY);
 
 const VoiceVisualizer = ({ isActive }) => {
   const bars = 20;

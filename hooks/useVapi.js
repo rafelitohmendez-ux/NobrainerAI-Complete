@@ -27,7 +27,7 @@ export const useVapi = () => {
     const assistantId = urlParams.get('assistantId');
 
     if (assistantId && !vapi) {
-      const vapiInstance = new Vapi(process.env.VAPI_PUBLIC_KEY);
+      const vapiInstance = new Vapi(process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY);
       setVapi(vapiInstance);
 
       vapiInstance.on("call-start", () => {

@@ -19,7 +19,7 @@ import { createClient } from '@supabase/supabase-js';
 import confetti from 'canvas-confetti';
 import { Progress } from "@/components/ui/progress";
 
-const supabase = createClient('https://tnijqmtoqpmgdhvltuhl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRuaWpxbXRvcXBtZ2Rodmx0dWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjUwOTE3MzcsImV4cCI6MjA0MDY2NzczN30.3c2EqGn5n0jLmG4l2NO_ovN_aIAhaLDBa0EKdwdnhCg')
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY, process.env.NEXT_PUBLIC_SUPABASE_PRIVATE_KEY);
 
 
 const RAGInterface = () => {
@@ -190,7 +190,7 @@ const RAGInterface = () => {
       const response = await fetch('https://api.vapi.ai/file', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer 8dfdd899-8c45-418d-86bb-8655a4146e66`,
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_VAPI_PRIVATE_KEY}`,
         },
         body: formData,
       });
@@ -311,7 +311,7 @@ const RAGInterface = () => {
       const response = await fetch('https://api.vapi.ai/assistant', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer 8dfdd899-8c45-418d-86bb-8655a4146e66`,
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_VAPI_PRIVATE_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(assistantData),
@@ -341,7 +341,7 @@ const RAGInterface = () => {
   };
 
   const iframeCode = `<iframe
-  src="https://nchatbot.netlify.app/bot?assistantId=${createdAssistantId}"
+  src="${process.env.NEXT_PUBLIC_BASE_URL}/bot?assistantId=${createdAssistantId}"
   width="100%"
   height="600"
   frameborder="0"
@@ -759,7 +759,7 @@ Add this code to your theme.liquid file, just before the closing </body> tag
                     <pre className="bg-gray-900/50 p-6 rounded-lg overflow-x-auto border border-gray-700">
 
                     <iframe
-            src={`http://localhost:3000/bot/assistantId=${createdAssistantId}`}
+            src={`${process.env.NEXT_PUBLIC_BASE_URL}/bot/assistantId=${createdAssistantId}`}
             width="100%"
             height="700"
             frameBorder="0"

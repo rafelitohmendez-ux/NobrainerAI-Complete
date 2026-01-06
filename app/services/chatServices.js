@@ -1,3 +1,5 @@
+
+
 // src/app/services/chatService.js
 export const sendMessageToProvider = async (provider, model, message, apiKey, generationType = 'text') => {
     if (generationType === 'image') {
@@ -158,3 +160,6 @@ export const sendMessageToProvider = async (provider, model, message, apiKey, ge
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
   }
+  
+
+  

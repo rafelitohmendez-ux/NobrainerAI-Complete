@@ -78,15 +78,15 @@ const VisionChatPage = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer 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`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`
         },
         body: JSON.stringify({
           messages: [{
             role: "user",
             content: messageContent
           }],
-          model: "llama-3.2-90b-vision-preview",
-          temperature: 0.7,
+         model: "meta-llama/llama-4-scout-17b-16e-instruct",
+          temperature: 1,
           max_tokens: 1024,
           top_p: 1,
           stream: false
@@ -200,7 +200,7 @@ const VisionChatPage = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 bg-gray-800 border-gray-700 focus:border-indigo-600"
+                className="flex-1 bg-gray-800 text-white border-gray-700 focus:border-indigo-600"
               />
               <Button
                 onClick={handleSendMessage}

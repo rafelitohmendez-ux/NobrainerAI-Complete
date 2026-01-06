@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Check, AlertCircle, Download, FileText } from 'lucide-react';
+import { Check, AlertCircle, Download, Printer } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 
 const documentTypes = [
@@ -36,25 +36,42 @@ const DocumentGenerator = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': 'AIzaSyAVatQQ5qhcrb0mFWb31RnEjZ_wxBJ9szU',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Generate a professional ${docType} with these details: ${details}. 
-                     Format it as a proper legal/business document with appropriate sections, 
-                     clauses, and formatting. Include all necessary components for a ${docType}.`
-            }]
-          }]
+          messages: [
+            {
+              role: 'user',
+              content: `Generate a professional ${docType} with these details: ${details}. 
+                       Format it as a proper legal/business document with appropriate sections, 
+                       clauses, and formatting. Include all necessary components for a ${docType}.
+                       Make sure it's properly formatted for printing with clear structure and professional layout.`
+            }
+          ],
+          model: 'groq/compound',
+          temperature: 1,
+          max_completion_tokens: 1024,
+          top_p: 1,
+          stream: false,
+          stop: null,
+          compound_custom: {
+            tools: {
+              enabled_tools: [
+                'web_search',
+                'code_interpreter',
+                'visit_website'
+              ]
+            }
+          }
         })
       });
 
       const data = await response.json();
-      setGeneratedDoc(data.candidates[0].content.parts[0].text);
+      setGeneratedDoc(data.choices[0].message.content);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
@@ -72,6 +89,94 @@ const DocumentGenerator = () => {
     a.href = url;
     a.download = `${docType}-${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Document</title>
+        <style>
+          body { 
+            font-family: 'Times New Roman', serif; 
+            margin: 40px;
+            line-height: 1.6;
+            color: #000;
+            background: white;
+          }
+          .document-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #000;
+          }
+          .document-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+          }
+          .document-date {
+            font-size: 14px;
+            color: #666;
+          }
+          .document-content {
+            font-size: 12px;
+            text-align: justify;
+          }
+          .section {
+            margin-bottom: 20px;
+          }
+          .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+          }
+          .signature-line {
+            border-top: 1px solid #000;
+            width: 200px;
+            text-align: center;
+            padding-top: 5px;
+            font-size: 12px;
+          }
+          @media print {
+            body { margin: 20px; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="document-header">
+          <div class="document-title">${docType.replace('-', ' ').toUpperCase()}</div>
+          <div class="document-date">Generated on ${new Date().toLocaleDateString()}</div>
+        </div>
+        <div class="document-content">
+          ${generatedDoc.replace(/\n/g, '<br>')}
+        </div>
+        <div class="signature-section">
+          <div class="signature-line">
+            <div>Signature</div>
+            <div>Date</div>
+          </div>
+          <div class="signature-line">
+            <div>Print Name</div>
+            <div>Title</div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   return (
@@ -111,7 +216,7 @@ const DocumentGenerator = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <Select onValueChange={setDocType}>
-              <SelectTrigger className="bg-gray-800 border-gray-700">
+              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                 <SelectValue placeholder="Select document type" />
               </SelectTrigger>
               <SelectContent>
@@ -127,7 +232,7 @@ const DocumentGenerator = () => {
               placeholder="Enter document details (e.g., parties involved, terms, dates, amounts...)"
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              className="bg-gray-800 border-gray-700 min-h-[150px]"
+              className="bg-gray-800 border-gray-700 min-h-[150px] text-white placeholder-gray-400"
             />
 
             <Button
@@ -144,13 +249,19 @@ const DocumentGenerator = () => {
           <Card className="bg-gray-900 border-2 border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-2xl font-bold text-white">Generated Document</CardTitle>
-              <Button onClick={handleDownload} variant="outline" className="bg-gray-800">
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={handlePrint} variant="outline" className="bg-gray-800 text-white">
+                  <Printer className="w-4 h-4 mr-2" />
+                  Print
+                </Button>
+                <Button onClick={handleDownload} variant="outline" className="bg-gray-800 text-white">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-800 p-6 rounded-lg whitespace-pre-wrap font-mono text-sm">
+              <div className="bg-gray-800 p-6 rounded-lg whitespace-pre-wrap font-mono text-sm text-white">
                 {generatedDoc}
               </div>
             </CardContent>
