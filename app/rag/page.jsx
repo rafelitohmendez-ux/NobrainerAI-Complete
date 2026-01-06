@@ -341,7 +341,7 @@ const RAGInterface = () => {
   };
 
   const iframeCode = `<iframe
-  src="${process.env.NEXT_PUBLIC_BASE_URL}/bot?assistantId=${createdAssistantId}"
+  src="${process.env.NEXT_PUBLIC_BASE_URL}/bot/${createdAssistantId}"
   width="100%"
   height="600"
   frameborder="0"
