@@ -759,7 +759,7 @@ Add this code to your theme.liquid file, just before the closing </body> tag
                     <pre className="bg-gray-900/50 p-6 rounded-lg overflow-x-auto border border-gray-700">
 
                     <iframe
-            src={`${process.env.NEXT_PUBLIC_BASE_URL}/bot/assistantId=${createdAssistantId}`}
+            src={`${process.env.NEXT_PUBLIC_BASE_URL}/bot/${createdAssistantId}`}
             width="100%"
             height="700"
             frameBorder="0"
