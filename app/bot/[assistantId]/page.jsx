@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { createClient } from '@supabase/supabase-js';
 import { useVapi } from '@/hooks/useVapi';
+import { useParams } from 'next/navigation';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY, process.env.NEXT_PUBLIC_SUPABASE_PRIVATE_KEY);
 
@@ -159,8 +160,8 @@ const VapiChatbot = () => {
 
   useEffect(() => {
     const fetchAssistantName = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const assistantId = urlParams.get('assistantId');
+      const params = useParams();
+      const assistantId = params.assistantId;
 
       if (assistantId) {
         const { data, error } = await supabase
