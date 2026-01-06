@@ -341,14 +341,14 @@ const RAGInterface = () => {
     }
   };
 
-  const iframeCode = `<NoBrainerWidget
-  src="${process.env.NEXT_PUBLIC_BASE_URL}/bot/${createdAssistantId}"
-  width="100%"
-  height="600"
-  frameborder="0"
-  allow="microphone"
-  title="Created Assistant"
-></iframe>`;
+  const iframeCode = `
+                  
+<NoBrainerWidget 
+apiKey="${process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY}"
+assistantId="${createdAssistantId}"
+/>
+
+`;
 
   const shopifyCode = `{% comment %}
 Add this code to your theme.liquid file, just before the closing </body> tag
