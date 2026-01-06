@@ -18,6 +18,7 @@ import { useUser } from "@clerk/nextjs";
 import { createClient } from '@supabase/supabase-js';
 import confetti from 'canvas-confetti';
 import { Progress } from "@/components/ui/progress";
+import NoBrainerWidget from '@/components/callbot';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY, process.env.NEXT_PUBLIC_SUPABASE_PRIVATE_KEY);
 
@@ -340,7 +341,7 @@ const RAGInterface = () => {
     }
   };
 
-  const iframeCode = `<iframe
+  const iframeCode = `<NoBrainerWidget
   src="${process.env.NEXT_PUBLIC_BASE_URL}/bot/${createdAssistantId}"
   width="100%"
   height="600"
@@ -758,14 +759,11 @@ Add this code to your theme.liquid file, just before the closing </body> tag
                     <p className="mb-4 text-gray-300">Here's the iframe code for your new assistant:</p>
                     <pre className="bg-gray-900/50 p-6 rounded-lg overflow-x-auto border border-gray-700">
 
-                    <iframe
-            src={`${process.env.NEXT_PUBLIC_BASE_URL}/bot/${createdAssistantId}`}
-            width="100%"
-            height="700"
-            frameBorder="0"
-            allow="microphone"
-            title="Created Assistant"
-          ></iframe>
+                  
+<NoBrainerWidget 
+apiKey={`${process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY}`}
+assistantId={`${createdAssistantId}`}
+/>
 
                       
                     </pre>

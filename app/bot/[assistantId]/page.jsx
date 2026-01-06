@@ -157,12 +157,14 @@ const VapiChatbot = () => {
   const [assistantName, setAssistantName] = useState('AI Assistant');
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+ const params = useParams();
+      const assistantId = params.assistantId;
+
+
 
   useEffect(() => {
     const fetchAssistantName = async () => {
-      const params = useParams();
-      const assistantId = params.assistantId;
-
+     
       if (assistantId) {
         const { data, error } = await supabase
           .from('user_assistants')
