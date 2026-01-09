@@ -21,7 +21,10 @@ import { Progress } from "@/components/ui/progress";
 import NoBrainerWidget from '@/components/callbot';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY, process.env.NEXT_PUBLIC_SUPABASE_PRIVATE_KEY);
-
+// Safe Supabase initialization for Vercel Builds
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PRIVATE_KEY || 'placeholder_key';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const RAGInterface = () => {
   const [selectedRAG, setSelectedRAG] = useState(null);
