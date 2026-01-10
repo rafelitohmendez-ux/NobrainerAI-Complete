@@ -110,7 +110,8 @@ export default function Dashboard() {
   )
 }
 
-function AgentCard({ icon, title, description }) {
+// 1. Add 'href' to the properties here
+function AgentCard({ icon, title, description, href }) {
   const getIcon = () => {
     switch (icon) {
       case 'youtube':
@@ -149,32 +150,25 @@ function AgentCard({ icon, title, description }) {
             <Bot className="w-8 h-6 text-white" />
           </div>
         )
-        case 'ugc':
-        return (
-          <div className="w-10 h-10 bg-gradient-to-br from-yellow-600 to-orange-800 rounded-xl flex items-center justify-center shadow-lg">
-            <User2 className="w-8 h-6 text-white" />
-          </div>
-        ) 
-        case 'website':
-          return (
-            <div className="w-10 h-10 bg-white-to-br from-black-600 to-orange-800 rounded-xl flex items-center justify-center shadow-lg">
-              <AppWindow className="w-8 h-6 text-white" />
-            </div>
-          ) 
       default:
         return null
     }
   }
 
+  // 2. Wrap the Card in the Link component
   return (
-    <Card className="p-4 bg-gray-900 border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-xl shadow-lg group">
-      <div className="flex items-start gap-4">
-        {getIcon()}
-        <div>
-          <h3 className="font-semibold mb-1 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-300 transition-colors">{title}</h3>
-          <p className="text-sm text-gray-400">{description}</p>
+    <Link href={href || '#'}>
+      <Card className="p-4 bg-gray-900 border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-xl shadow-lg group">
+        <div className="flex items-start gap-4">
+          {getIcon()}
+          <div>
+            <h3 className="font-semibold mb-1 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-300 transition-colors">
+              {title}
+            </h3>
+            <p className="text-sm text-gray-400">{description}</p>
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </Link>
   )
 }
