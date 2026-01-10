@@ -118,7 +118,7 @@ const PricingPage = () => {
   // Initialize PayPal when component mounts
   React.useEffect(() => {
     const script = document.createElement('script');
-    script.src = "https://www.paypal.com/sdk/js?client-id=AQ3hHQbVcAFxIVpKOip-LluE3whXGHLeLpI215fswm7_9ulbeO6vlwMxpN5tE7vdQN8ej44pvFleU91r&currency=USD";
+    script.src = "https://www.paypal.com/sdk/js?client-id=AbCClsE054K43GW5JsywT4OCbn-z8WO2O4e5PCVk-hq03e3LWG16xcQCYEgQb_YJhjXNfMvOQzGGOqKu&currency=USD";
     script.async = true;
     script.onload = () => {
       if (window.paypal && selectedPlan) {
