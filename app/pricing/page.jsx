@@ -188,14 +188,34 @@ const PricingPage = () => {
     }
   };
 
-  const handlePlanSelection = (plan) => {
-    if (plan.price === "0") {
-      // Handle free plan signup
-      alert("You've signed up for the free plan!");
-      return;
+const handlePlanSelection = async (plan) => {
+    if (!user) return alert("Please log in first!");
+
+    // 1. Identify yourself (Put your Clerk ID here)
+    const isMe = user.id === 'user_YOUR_ID_HERE';
+
+    // 2. The Shortcut: If it's you OR the plan is free, skip the payment
+    if (isMe || plan.price === "0") {
+      
+      // This part tells your database to add the credits immediately
+      const { error } = await supabase
+        .from('user_credits')
+        .update({ credits: userCredits + plan.credits })
+        .eq('userid', user.id);
+
+      if (!error) {
+        setUserCredits(userCredits + plan.credits);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 5000);
+      } else {
+        alert("Database error. Make sure your Supabase is set up!");
+      }
+
+    } else {
+      // 3. The Paywall: For everyone else, show the PayPal screen
+      setSelectedPlan(plan);
+      setPaymentDialogOpen(true);
     }
-    setSelectedPlan(plan);
-    setPaymentDialogOpen(true);
   };
 
   return (
