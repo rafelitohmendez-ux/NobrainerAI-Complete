@@ -193,7 +193,6 @@ const handlePlanSelection = async (plan) => {
 
     // 1. Identify yourself (Put your Clerk ID here)
     const isMe = user.id === 'user_3856eLhjXs9njObuhQ1zfq7wXx3';
-
     // 2. The Shortcut: If it's you OR the plan is free, skip the payment
     if (isMe || plan.price === "0") {
       
