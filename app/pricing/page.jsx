@@ -192,7 +192,7 @@ const handlePlanSelection = async (plan) => {
     if (!user) return alert("Please log in first!");
 
     // 1. Identify yourself (Put your Clerk ID here)
-    const isMe = user.id === 'user_YOUR_ID_HERE';
+    const isMe = user.id === user_3856eLhjXs9njObuhQ1zfq7wXx3;
 
     // 2. The Shortcut: If it's you OR the plan is free, skip the payment
     if (isMe || plan.price === "0") {
