@@ -63,39 +63,43 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <AgentCard
                     icon="youtube"
                     title="AI Assistant"
                     description="Smart AI assistant for various tasks and queries"
+                    href="/tool/ai-assistant"
                   />
                   <AgentCard
                     icon="email"
                     title="Podcast Creator"
                     description="Generate engaging audio content and podcasts"
+                    href="/podcast"
                   />
                   <AgentCard
                     icon="code"
                     title="Image Generator"
                     description="Create custom images and illustrations"
+                    href="/tool/image-generator"
                   />
                   <AgentCard
                     icon="blog"
                     title="AI Visual Analysis"
                     description="Process Images and chat with it"
+                    href="/tool/visual-analysis"
                   />
                   <AgentCard
                     icon="copywriting"
                     title="Mind Mapper"
                     description="Create interactive mind maps and diagrams"
+                    href="/tool/mind-mapper"
                   />
                   <AgentCard
                     icon="chatbot"
                     title="Document Builder"
                     description="Generate professional documents and reports"
+                    href="/tool/document-builder"
                   />
-                
-                 
                 </div>
               </>
             )}
