@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { Search, Image, FileText, Mic, Paperclip, AtSign,User2, Menu, ChevronDown, Zap, Shield, ArrowRight, Loader, Send, PenTool, Bot, Music, HardDriveDownload, Paintbrush, Map, AppWindow } from 'lucide-react'
+import { Search, Image, FileText, Mic, Paperclip, AtSign, User2, Menu, ChevronDown, Zap, Shield, ArrowRight, Loader, Send, PenTool, Bot, Music, HardDriveDownload, Paintbrush, Map, AppWindow } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAI } from './context/AIContext'
 import { sendMessageToProvider } from './services/chatServices'
 import Link from 'next/link'
-
 import { Badge } from '@/components/ui/badge'
 
 export default function Dashboard() {
@@ -63,7 +62,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <AgentCard
                     icon="youtube"
                     title="AI Assistant"
@@ -110,7 +109,6 @@ export default function Dashboard() {
   )
 }
 
-// 1. Add 'href' to the properties here
 function AgentCard({ icon, title, description, href }) {
   const getIcon = () => {
     switch (icon) {
@@ -150,12 +148,23 @@ function AgentCard({ icon, title, description, href }) {
             <Bot className="w-8 h-6 text-white" />
           </div>
         )
+      case 'ugc':
+        return (
+          <div className="w-10 h-10 bg-gradient-to-br from-yellow-600 to-orange-800 rounded-xl flex items-center justify-center shadow-lg">
+            <User2 className="w-8 h-6 text-white" />
+          </div>
+        )
+      case 'website':
+        return (
+          <div className="w-10 h-10 bg-white-to-br from-black-600 to-orange-800 rounded-xl flex items-center justify-center shadow-lg">
+            <AppWindow className="w-8 h-6 text-white" />
+          </div>
+        )
       default:
         return null
     }
   }
 
-  // 2. Wrap the Card in the Link component
   return (
     <Link href={href || '#'}>
       <Card className="p-4 bg-gray-900 border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-xl shadow-lg group">
